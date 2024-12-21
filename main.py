@@ -81,22 +81,23 @@ def numenumerateSong(index, song, playlist):
         index = "00" + str(index)
         rename = str(index) + ". " + song
     elif index < 100:
-        index = "0" + str(playlist)
+        index = "0" + str(index)
         rename = str(index) + ". " + song
+    else: rename = str(index) + ". " + song
     os.rename(playlist + "/" + song, playlist + "/" + rename)
             
 def checkifNumerated(playlist):
     songs = getSongs(playlist)
     numerated = True
     for index, song in enumerate(songs):
-        if not (song[3] == "." and (int(song[2]) >= 0 and int(song[2]) <= 9)):
+        if not (song[3] == "." and song[2].isdigit() and song[1].isdigit() and song[0].isdigit()):
             numerated = False
             break
 
     if numerated == False:
         if input("Looks like some songs in \"{}\" are not numerated. Do you want to numerate them? (Y/n) ". format(playlist)) == "Y":
             for index, song in enumerate(songs):
-                if not (song[3] == "." and (int(song[2]) >= 0 and int(song[2]) <= 9)):
+                if not (song[3] == "." and song[2].isdigit() and song[1].isdigit() and song[0].isdigit()):
                     numenumerateSong(index, song, playlist)
             return True
         else: return False
@@ -121,6 +122,7 @@ def closeGaps(playlist, songs):
             new_index = int(next_index) - (diff - 1)
             if new_index < 10: new_index = "00" + str(new_index) + ". "
             elif new_index < 100: new_index = "0" + str(new_index) + ". "
+            else: new_index = str(new_index) + ". "
 
             songs[i+1] = new_index + next_song
             os.rename((playlist + "/" + next_index + ". " + next_song), (playlist + "/" + new_index + next_song))
@@ -145,13 +147,13 @@ def shifting(playlist, songs, song_index, position, moveUp):
     os.rename((playlist + "/" + songs[int(song_index)]), playlist + "/" + position + ". " + songs[int(song_index)][5:])
 
 def sortPlaylist(playlists):
+    playlist = choosePlaylist(playlists, "\nEnter which playlist you want to sort: (enter \"x\" to cancel) ")
+    if playlist == "x": return
+
     songs = getSongs(playlist)
     if len(songs) >= 999:
         print("Playlist is full.")
         return
-
-    playlist = choosePlaylist(playlists, "\nEnter which playlist you want to sort: (enter \"x\" to cancel) ")
-    if playlist == "x": return
     
     while True:
         songs = getSongs(playlist)
